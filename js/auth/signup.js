@@ -6,53 +6,55 @@ const inputMail = document.getElementById("MailInput");
 const inputPassword = document.getElementById("PasswordInput");
 const inputValidationPassword = document.getElementById("ValidatePasswordInput");
 const btnValidation = document.getElementById("btn-validation-inscription");
+const formInscription = document.getElementById("formulaireInscription");
 
-inputNom.addEventListener("keyup",validateForm);
-inputPrenom.addEventListener("keyup",validateForm);
-inputMail.addEventListener("keyup",validateForm);
-inputPassword.addEventListener("keyup",validateForm);
-inputValidationPassword.addEventListener("keyup",validateForm);
+inputNom.addEventListener("keyup", validateForm);
+inputPrenom.addEventListener("keyup", validateForm);
+inputMail.addEventListener("keyup", validateForm);
+inputPassword.addEventListener("keyup", validateForm);
+inputValidationPassword.addEventListener("keyup", validateForm);
+
+btnValidation.addEventListener("click", InscrireUtilisateur);
 
 
-
-function validateForm(){
+function validateForm() {
   const nomOk = validateRequired(inputNom);
   const prenomOk = validateRequired(inputPrenom);
   const mailOk = validateMail(inputMail);
   const passwordOk = validatePassword(inputPassword);
-  const confirmPasswordOk = validateConfirmationPassword(inputPassword,inputValidationPassword);
+  const confirmPasswordOk = validateConfirmationPassword(inputPassword, inputValidationPassword);
 
 
-  if(nomOk && prenomOk && mailOk && passwordOk && confirmPasswordOk){
+  if (nomOk && prenomOk && mailOk && passwordOk && confirmPasswordOk) {
     btnValidation.disabled = false;
-  }else{
+  } else {
     btnValidation.disabled = true;
   }
 }
 
-function validateConfirmationPassword(inputPwd,inputConfirmPwd){
-  if(inputPwd.value === inputConfirmPwd.value){
+function validateConfirmationPassword(inputPwd, inputConfirmPwd) {
+  if (inputPwd.value === inputConfirmPwd.value) {
     inputConfirmPwd.classList.add("is-valid");
     inputConfirmPwd.classList.remove("is-invalid");
     return true;
-  }else{
+  } else {
     inputConfirmPwd.classList.add("is-invalid");
     inputConfirmPwd.classList.remove("is-valid");
     return false;
   }
 }
 
-function validatePassword(input){
+function validatePassword(input) {
   //Définir mon regex
-  const passwordRegex =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/;
   const passwordUser = input.value;
-  if(passwordUser.match(passwordRegex)){
+  if (passwordUser.match(passwordRegex)) {
     //C'est ok
     input.classList.add("is-valid");
     input.classList.remove("is-invalid");
     return true;
 
-  }else{
+  } else {
     //Il y a une erreur
     input.classList.add("is-invalid");
     input.classList.remove("is-valid");
@@ -60,17 +62,17 @@ function validatePassword(input){
   }
 }
 
-function validateMail(input){
+function validateMail(input) {
   //Définir mon regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const mailUser = input.value;
-  if(mailUser.match(emailRegex)){
+  if (mailUser.match(emailRegex)) {
     //C'est ok
     input.classList.add("is-valid");
     input.classList.remove("is-invalid");
     return true;
 
-  }else{
+  } else {
     //Il y a une erreur
     input.classList.add("is-invalid");
     input.classList.remove("is-valid");
@@ -78,16 +80,55 @@ function validateMail(input){
   }
 }
 
-function validateRequired(input){
-  if(input.value != ""){
+function validateRequired(input) {
+  if (input.value != "") {
     //C'est ok
     input.classList.add("is-valid");
     input.classList.remove("is-invalid");
     return true;
-  }else{
+  } else {
     //Il y a une erreur
     input.classList.add("is-invalid");
     input.classList.remove("is-valid");
     return false;
   }
+}
+
+function InscrireUtilisateur() {
+
+  let dataForm = new FormData(formInscription);
+
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const raw = JSON.stringify({
+    "firstName": dataForm.get("nom"),
+    "lastName": dataForm.get("prenom"),
+    "email": dataForm.get("email"),
+    "password": dataForm.get("mdp")
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow"
+  };
+
+  fetch("http://127.0.0.1:8000/api/registration", requestOptions)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        alert("Une erreur est survenue lors de l'inscription. Veuillez réessayer.");
+      }
+
+    })
+    .then((result) => {
+      alert("Bravo " + dataForm.get("prenom") + ", vous êtes maintenant inscrit ! Vous pouvez vous connecter.");
+      document.location.href = "/signin";
+      console.log(result);
+    })
+    .catch((error) => console.error(error));
 }
