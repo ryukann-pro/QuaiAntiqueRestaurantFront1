@@ -99,17 +99,17 @@ function InscrireUtilisateur() {
   let dataForm = new FormData(formInscription);
 
 
-  const myHeaders = new Headers();
+  let myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
 
-  const raw = JSON.stringify({
+  let raw = JSON.stringify({
     "firstName": dataForm.get("nom"),
     "lastName": dataForm.get("prenom"),
     "email": dataForm.get("email"),
     "password": dataForm.get("mdp")
   });
 
-  const requestOptions = {
+  let requestOptions = {
     method: "POST",
     headers: myHeaders,
     body: raw,
